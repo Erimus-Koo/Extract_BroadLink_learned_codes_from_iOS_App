@@ -49,8 +49,9 @@ def extract_code(json_file=None):
 
         try:
             val = content['cmdParamList'][0]['vals'][0][0]['val']
+            b64val = base64.b64encode(binascii.unhexlify(val)).decode('utf8')
         except Exception:
-            val = None
+            b64val = None
 
         extend = json.loads(content['extend'])
         # print(json.dumps(extend, ensure_ascii=False, indent=4))
@@ -60,21 +61,19 @@ def extract_code(json_file=None):
         except Exception:
             did = func = None
 
-        if did and func:
-            key = f'{did}_{func}'
-        else:
-            key = str(index)
+        did = did if did else 'Others'
+        func = func if func else str(index)
+        result.setdefault(did, {})
 
-        b64val = base64.b64encode(binascii.unhexlify(val)).decode('utf8')
+        result[did][func] = {'name': name, 'base64': b64val}
 
-        result[key] = {'name': name, 'func': func, 'base64': b64val}
-
-    print(json.dumps(result, ensure_ascii=False, indent=4))
+    result_json = json.dumps(result, ensure_ascii=False, indent=4, sort_keys=True)
+    print(result_json)
 
     # write result file
     output = os.path.join(json_path, 'codes.txt')
     with open(output, 'w', encoding='utf-8') as f:
-        f.write(json.dumps(result, ensure_ascii=False, indent=2))
+        f.write(result_json)
     print(f'{"="*30}\nAll codes saved in "{output}".')
 
 
