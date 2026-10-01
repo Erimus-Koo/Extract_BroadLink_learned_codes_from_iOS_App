@@ -55,3 +55,4 @@ Temporary Items
 # Broadlink database files (contain personal device data)
 *.sqlite
 *.json
+codes.txt
